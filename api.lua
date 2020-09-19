@@ -10,20 +10,37 @@ playertag = {
 	TYPE_ENTITY  = TYPE_ENTITY,
 }
 
+-- char widths
+local width = {
+	a=10,b=9,c=8,d=9,e=9,f=6,g=9,h=9,i=3,j=4,k=9,l=3,m=13,
+	n=9,o=9,p=9,q=9,r=6,s=8,t=6,u=9,v=9,w=13,x=8,y=10,z=7,A=12,B=11,
+	C=12,D=12,E=11,F=10,G=13,H=12,I=3,J=9,K=11,L=9,M=14,N=12,O=13,P=11,
+	Q=13,R=12,S=11,T=13,U=12,V=11,W=18,X=10,Y=11,Z=10
+}
+width["0"] = 9; width["1"] = 9; width["2"] = 9; width["3"] = 9
+width["4"] = 10; width["5"] = 9; width["6"] = 9; width["7"] = 9
+width["8"] = 9; width["9"] = 9; width["-"] = 5; width["_"] = 7
+
 local function add_entity_tag(player, color)
 	local ent = minetest.add_entity(player:get_pos(), "playertag:tag")
 
 	-- Build name from font texture
 	local name = player:get_player_name()
 	local texture = "npcf_tag_bg.png"
-	local x = math.floor(134 - ((name:len() * 11) / 2))
+	local l = 0
+	name:gsub(".", function(char)
+		if char == 'j' then l = l - 1 end
+		l = l + width[char]
+	end)
+	local x = math.floor(134 - (l / 2)) - 1
 	local i = 0
 	name:gsub(".", function(char)
 		if char:byte() > 64 and char:byte() < 91 then
 			char = "U"..char
 		end
-		texture = texture.."^[combine:84x14:"..(x+i)..",0=W_"..char..".png"
-		i = i + 11
+		if i > 0 and char == 'j' then i = i - 1 end
+		texture = texture.."^[combine:84x16:"..(x+i)..",0=W_"..char..".png"
+		i = i + width[char]
 	end)
 
 	color = color or "#FFFFFFFF" -- init if reqd
